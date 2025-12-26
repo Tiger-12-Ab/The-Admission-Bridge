@@ -3,7 +3,7 @@ import { User, Eye, EyeOff } from "lucide-react";
 import { api } from "../api/api";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [show, setShow] = useState(false);
@@ -101,14 +101,15 @@ export default function Login() {
 
           {/* Register link */}
           <p className="text-white mt-4 text-sm text-center">
-            Don’t have an account?{" "}
-            <a
-              href="/register"
-              className="hover:underline font-medium cursor-pointer"
-            >
-              Register
-            </a>
-          </p>
+  Don’t have an account?{" "}
+  <Link
+    to="/register"
+    className="hover:underline font-medium cursor-pointer"
+  >
+    Register
+  </Link>
+</p>
+
         </div>
       </div>
     </div>
