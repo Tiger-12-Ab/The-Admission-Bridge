@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../config/db";
 
+// =====================
 // REGISTER
+// =====================
 export const register = async (req: Request, res: Response) => {
   try {
     const {
@@ -30,6 +32,7 @@ export const register = async (req: Request, res: Response) => {
 
     const userId = userResult.insertId;
 
+    // EDUCATION
     if (education?.education_level) {
       await db.query(
         `INSERT INTO user_academics
@@ -47,6 +50,7 @@ export const register = async (req: Request, res: Response) => {
       );
     }
 
+    // TEST
     if (test?.test_type) {
       await db.query(
         `INSERT INTO user_academics
@@ -56,14 +60,16 @@ export const register = async (req: Request, res: Response) => {
       );
     }
 
-    res.status(201).json({ message: "Registration successful" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Registration failed" });
+    return res.status(201).json({ message: "Registration successful" });
+  } catch (error) {
+    console.error("Register error:", error);
+    return res.status(500).json({ message: "Registration failed" });
   }
 };
 
+// =====================
 // LOGIN
+// =====================
 export const login = async (req: Request, res: Response) => {
   try {
     const { identifier, password } = req.body;
@@ -88,8 +94,9 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // ---- ENV SAFE JWT SETUP ----
     const JWT_SECRET = process.env.JWT_SECRET as string;
-    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+    const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN ?? "7d";
 
     if (!JWT_SECRET) {
       throw new Error("JWT_SECRET is not defined");
@@ -101,9 +108,15 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: JWT_EXPIRES_IN }
     );
 
-    res.json({ token, user: { id: user.id, name: user.full_name } });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Login failed" });
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.full_name,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Login failed" });
   }
 };
