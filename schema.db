@@ -1,0 +1,226 @@
+-- =========================
+-- USERS (AUTH + PROFILE)
+-- =========================
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  full_name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE,
+  phone VARCHAR(20) UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  address TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================
+-- USER ACADEMIC RECORDS
+-- (Education + Test Scores)
+-- =========================
+CREATE TABLE user_academics (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+
+  -- Type of record
+  record_type ENUM('education', 'test') NOT NULL,
+
+  -- Education fields
+  education_level ENUM('college', 'bsc', 'msc', 'phd'),
+  institution VARCHAR(150),
+  course VARCHAR(100),
+  subject VARCHAR(100),
+  graduation_date DATE,
+  gpa DECIMAL(3,2),
+
+  -- Test fields
+  test_type ENUM('IELTS', 'SAT', 'TOEFL', 'GRE'),
+  test_score DECIMAL(5,2),
+
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- =========================
+-- UNIVERSITIES
+-- =========================
+CREATE TABLE universities (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  phone VARCHAR(20),
+  email VARCHAR(100),
+  address TEXT
+);
+
+-- =========================
+-- COURSES (SUBJECT + ELIGIBILITY)
+-- =========================
+CREATE TABLE courses (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  university_id INT NOT NULL,
+  degree_level ENUM('diploma', 'bsc', 'msc', 'phd') NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  duration_years INT,
+  total_tuition DECIMAL(10,2),
+
+  -- Eligibility
+  min_gpa DECIMAL(3,2),
+  required_previous_level ENUM('college', 'bsc', 'msc'),
+  min_ielts DECIMAL(3,1),
+  min_sat INT,
+  student_type ENUM('onshore', 'offshore'),
+
+  FOREIGN KEY (university_id) REFERENCES universities(id) ON DELETE CASCADE
+);
+
+-- =========================
+-- APPLICATIONS
+-- =========================
+CREATE TABLE applications (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  university_id INT NOT NULL,
+  course_id INT NOT NULL,
+  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (university_id) REFERENCES universities(id),
+  FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+
+
+INSERT INTO universities (name, phone, email, address) VALUES
+('University of Dhaka', '+880-2-9661900', 'info@du.ac.bd', 'Dhaka, Bangladesh'),
+('Bangladesh University of Engineering and Technology', '+880-2-9665604', 'info@buet.ac.bd', 'Dhaka, Bangladesh'),
+('North South University', '+880-2-55668200', 'info@nsu.edu.bd', 'Bashundhara, Dhaka'),
+('BRAC University', '+880-2-9844051', 'info@bracu.ac.bd', 'Mohakhali, Dhaka'),
+('Independent University Bangladesh', '+880-2-8431645', 'info@iub.edu.bd', 'Bashundhara, Dhaka'),
+('University of Chittagong', '+880-31-726311', 'info@cu.ac.bd', 'Chittagong, Bangladesh'),
+('Jahangirnagar University', '+880-2-7791045', 'info@juniv.edu', 'Savar, Dhaka'),
+('East West University', '+880-2-9882308', 'info@ewu.edu.bd', 'Aftabnagar, Dhaka');
+
+INSERT INTO courses (
+  university_id,
+  degree_level,
+  subject,
+  duration_years,
+  total_tuition,
+  min_gpa,
+  required_previous_level,
+  min_ielts,
+  min_sat,
+  student_type
+) VALUES
+
+-- University of Dhaka (id = 1)
+(1, 'bsc', 'Computer Science', 4, 3500.00, 3.50, 'college', 6.0, NULL, 'onshore'),
+(1, 'msc', 'Computer Science', 2, 2500.00, 3.00, 'bsc', 6.5, NULL, 'onshore'),
+(1, 'bsc', 'Economics', 4, 3000.00, 3.20, 'college', 6.0, NULL, 'onshore'),
+
+-- BUET (id = 2)
+(2, 'bsc', 'Electrical Engineering', 4, 4000.00, 3.80, 'college', 6.5, NULL, 'onshore'),
+(2, 'msc', 'Mechanical Engineering', 2, 3500.00, 3.50, 'bsc', 6.5, NULL, 'onshore'),
+
+-- North South University (id = 3)
+(3, 'bsc', 'Computer Science & Engineering', 4, 12000.00, 2.80, 'college', 5.5, 1100, 'offshore'),
+(3, 'bsc', 'Business Administration', 4, 10000.00, 2.50, 'college', 5.5, 1000, 'offshore'),
+(3, 'msc', 'MBA', 1, 8000.00, 2.75, 'bsc', 6.0, NULL, 'offshore'),
+
+-- BRAC University (id = 4)
+(4, 'bsc', 'Software Engineering', 4, 11000.00, 2.70, 'college', 5.5, 1050, 'offshore'),
+(4, 'msc', 'Data Science', 2, 9000.00, 3.00, 'bsc', 6.5, NULL, 'offshore'),
+
+-- Independent University Bangladesh (id = 5)
+(5, 'bsc', 'Environmental Science', 4, 9500.00, 2.60, 'college', 5.5, NULL, 'offshore'),
+(5, 'msc', 'Development Studies', 2, 7000.00, 2.80, 'bsc', 6.0, NULL, 'offshore'),
+
+-- University of Chittagong (id = 6)
+(6, 'bsc', 'Marine Science', 4, 2800.00, 3.00, 'college', 6.0, NULL, 'onshore'),
+(6, 'msc', 'Oceanography', 2, 2200.00, 3.00, 'bsc', 6.5, NULL, 'onshore'),
+
+-- Jahangirnagar University (id = 7)
+(7, 'bsc', 'Anthropology', 4, 2600.00, 3.10, 'college', 6.0, NULL, 'onshore'),
+(7, 'msc', 'Public Administration', 2, 2400.00, 3.00, 'bsc', 6.0, NULL, 'onshore'),
+
+-- East West University (id = 8)
+(8, 'bsc', 'Computer Science', 4, 10500.00, 2.70, 'college', 5.5, 1050, 'offshore'),
+(8, 'msc', 'Computer Science', 2, 8500.00, 2.90, 'bsc', 6.0, NULL, 'offshore');
+
+INSERT INTO universities (name, phone, email, address) VALUES
+-- 🇧🇩 Bangladesh
+('University of Dhaka', '+880-2-9661900', 'info@du.ac.bd', 'Dhaka, Bangladesh'),
+('BRAC University', '+880-2-9844051', 'info@bracu.ac.bd', 'Dhaka, Bangladesh'),
+
+-- 🇮🇳 India
+('University of Delhi', '+91-11-27667725', 'info@du.ac.in', 'Delhi, India'),
+('IIT Bombay', '+91-22-25722545', 'info@iitb.ac.in', 'Mumbai, India'),
+
+-- 🇺🇸 USA
+('Harvard University', '+1-617-495-1000', 'info@harvard.edu', 'Cambridge, MA, USA'),
+('Stanford University', '+1-650-723-2300', 'info@stanford.edu', 'Stanford, CA, USA'),
+('University of California, Berkeley', '+1-510-642-6000', 'info@berkeley.edu', 'Berkeley, CA, USA'),
+
+-- 🇬🇧 UK
+('University of Oxford', '+44-1865-270000', 'info@ox.ac.uk', 'Oxford, UK'),
+('University of Manchester', '+44-161-306-6000', 'info@manchester.ac.uk', 'Manchester, UK'),
+
+-- 🇨🇦 Canada
+('University of Toronto', '+1-416-978-2011', 'info@utoronto.ca', 'Toronto, Canada'),
+('University of British Columbia', '+1-604-822-2211', 'info@ubc.ca', 'Vancouver, Canada'),
+
+-- 🇦🇺 Australia
+('University of Melbourne', '+61-3-9035-5511', 'info@unimelb.edu.au', 'Melbourne, Australia'),
+('Monash University', '+61-3-9905-4000', 'info@monash.edu', 'Melbourne, Australia'),
+
+-- 🇩🇪 Germany
+('Technical University of Munich', '+49-89-289-01', 'info@tum.de', 'Munich, Germany'),
+('Heidelberg University', '+49-6221-54-0', 'info@uni-heidelberg.de', 'Heidelberg, Germany'),
+
+-- 🇯🇵 Japan
+('University of Tokyo', '+81-3-3812-2111', 'info@u-tokyo.ac.jp', 'Tokyo, Japan'),
+('Kyoto University', '+81-75-753-7531', 'info@kyoto-u.ac.jp', 'Kyoto, Japan');
+
+
+INSERT INTO courses (
+  university_id, degree_level, subject, duration_years, total_tuition,
+  min_gpa, required_previous_level, min_ielts, min_sat, student_type
+) VALUES
+
+-- 🇧🇩 Bangladesh
+(1, 'bsc', 'Computer Science', 4, 3000, 3.50, 'college', 6.0, NULL, 'onshore'),
+(1, 'msc', 'Artificial Intelligence', 2, 2500, 3.00, 'bsc', 6.5, NULL, 'onshore'),
+(2, 'bsc', 'Biotechnology', 4, 10000, 2.70, 'college', 5.5, NULL, 'offshore'),
+
+-- 🇮🇳 India
+(3, 'bsc', 'Political Science', 3, 4000, 3.00, 'college', 6.0, NULL, 'onshore'),
+(4, 'bsc', 'Computer Engineering', 4, 8000, 3.80, 'college', 6.5, NULL, 'onshore'),
+(4, 'msc', 'Robotics', 2, 9000, 3.50, 'bsc', 7.0, NULL, 'onshore'),
+
+-- 🇺🇸 USA
+(5, 'bsc', 'Economics', 4, 55000, 3.70, 'college', 7.0, 1400, 'offshore'),
+(5, 'msc', 'Data Science', 2, 60000, 3.50, 'bsc', 7.5, NULL, 'offshore'),
+(6, 'phd', 'Computer Science', 5, 0, 3.80, 'msc', 8.0, NULL, 'offshore'),
+(7, 'bsc', 'Environmental Science', 4, 45000, 3.40, 'college', 7.0, 1300, 'offshore'),
+
+-- 🇬🇧 UK
+(8, 'bsc', 'Philosophy', 3, 38000, 3.60, 'college', 7.0, NULL, 'offshore'),
+(8, 'msc', 'Machine Learning', 1, 42000, 3.50, 'bsc', 7.5, NULL, 'offshore'),
+(9, 'bsc', 'Accounting & Finance', 3, 35000, 3.20, 'college', 6.5, NULL, 'offshore'),
+
+-- 🇨🇦 Canada
+(10, 'bsc', 'Computer Engineering', 4, 48000, 3.30, 'college', 6.5, 1250, 'offshore'),
+(10, 'msc', 'Health Informatics', 2, 42000, 3.00, 'bsc', 7.0, NULL, 'offshore'),
+(11, 'bsc', 'Forestry', 4, 40000, 3.00, 'college', 6.5, NULL, 'offshore'),
+
+-- 🇦🇺 Australia
+(12, 'bsc', 'Architecture', 5, 52000, 3.20, 'college', 6.5, NULL, 'offshore'),
+(12, 'msc', 'Urban Planning', 2, 45000, 3.00, 'bsc', 7.0, NULL, 'offshore'),
+(13, 'bsc', 'Information Systems', 3, 43000, 2.80, 'college', 6.0, NULL, 'offshore'),
+
+-- 🇩🇪 Germany
+(14, 'bsc', 'Mechanical Engineering', 3, 3000, 3.40, 'college', 6.5, NULL, 'offshore'),
+(14, 'msc', 'Automotive Engineering', 2, 3500, 3.20, 'bsc', 6.5, NULL, 'offshore'),
+(15, 'phd', 'Physics', 4, 0, 3.70, 'msc', 7.0, NULL, 'offshore'),
+
+-- 🇯🇵 Japan
+(16, 'bsc', 'International Relations', 4, 12000, 3.00, 'college', 6.0, NULL, 'offshore'),
+(16, 'msc', 'Quantum Computing', 2, 15000, 3.50, 'bsc', 7.0, NULL, 'offshore'),
+(17, 'bsc', 'Civil Engineering', 4, 10000, 3.20, 'college', 6.0, NULL, 'offshore');
