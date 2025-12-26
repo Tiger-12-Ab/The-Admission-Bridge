@@ -3,20 +3,47 @@ import { useCompare } from "../context/CompareContext";
 import { api } from "../api/api";
 import { Trash2 } from "lucide-react";
 
+/* ---------------- TYPES ---------------- */
+
+interface CompareCourse {
+  id: number;
+}
+
+interface ComparedCourseData {
+  id: number;
+  university_name: string;
+  university_address?: string;
+  subject?: string;
+  degree_level?: string;
+  duration_years?: number;
+  total_tuition?: number;
+  min_gpa?: number;
+  min_ielts?: number;
+  student_type?: string;
+}
+
+/* ---------------- COMPONENT ---------------- */
+
 export default function Compare() {
-  const { compareCourses, clearCompare } = useCompare();
-  const [data, setData] = useState<any[]>([]);
+  const { compareCourses, clearCompare } = useCompare() as {
+    compareCourses: CompareCourse[];
+    clearCompare: () => void;
+  };
+
+  const [data, setData] = useState<ComparedCourseData[]>([]);
 
   useEffect(() => {
     const fetchCompare = async () => {
-      const res = await api.post("/compare", {
-        courseIds: compareCourses.map(c => c.id),
+      const res = await api.post<ComparedCourseData[]>("/compare", {
+        courseIds: compareCourses.map((c: CompareCourse) => c.id),
       });
       setData(res.data);
     };
 
-    if (compareCourses.length >= 2) fetchCompare();
-  }, []);
+    if (compareCourses.length >= 2) {
+      fetchCompare();
+    }
+  }, [compareCourses]);
 
   if (compareCourses.length < 2) {
     return (
@@ -37,7 +64,7 @@ export default function Compare() {
           <thead className="bg-green-50">
             <tr>
               <th className="p-3 border">Feature</th>
-              {data.map(c => (
+              {data.map((c) => (
                 <th key={c.id} className="p-3 border">
                   {c.university_name}
                 </th>
@@ -58,9 +85,9 @@ export default function Compare() {
             ].map(([label, key]) => (
               <tr key={label}>
                 <td className="p-3 border font-medium">{label}</td>
-                {data.map(c => (
+                {data.map((c) => (
                   <td key={c.id} className="p-3 border text-center">
-                    {c[key] || "N/A"}
+                    {(c as any)[key] ?? "N/A"}
                   </td>
                 ))}
               </tr>
