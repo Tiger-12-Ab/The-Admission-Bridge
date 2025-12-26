@@ -4,7 +4,7 @@ import {
   updateProfile,
   updateAcademic,
 } from "../controllers/dashboard";
-import authMiddleware from "../middleware/authmiddleware";
+import authMiddleware from "../middleware/authMiddleware";
 
 const router = express.Router();
 
