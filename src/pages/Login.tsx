@@ -60,7 +60,7 @@ export default function Login() {
       {/* Right side (form) */}
       <div className="flex w-full md:w-1/2 items-center justify-center px-4">
         <div className="bg-white/20 backdrop-blur-lg p-8 rounded-xl w-full max-w-md">
-          <h2 className="text-white text-2xl mb-6 text-center md:text-left">
+          <h2 className="text-white text-2xl pb-6 text-center md:text-left">
             Login
           </h2>
 

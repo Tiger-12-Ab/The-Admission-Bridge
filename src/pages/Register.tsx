@@ -5,6 +5,7 @@ import "react-phone-input-2/lib/style.css";
 import { api } from "../api/api";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -64,7 +65,7 @@ export default function Register() {
       {/* FORM */}
       <div className="flex w-full md:w-1/2 items-center justify-center px-4">
         <div className="bg-white/20 backdrop-blur-lg p-6 rounded-xl w-full max-w-lg">
-          <h2 className="text-white text-2xl mb-4 text-center">
+          <h2 className="text-white text-2xl pb-4 text-center">
             Register
           </h2>
 
@@ -227,12 +228,12 @@ export default function Register() {
           {/* LOGIN LINK */}
           <p className="text-white mt-4 text-sm text-center">
             Already have an account?{" "}
-            <a
-              href="/login"
-              className="hover:underline cursor-pointer font-medium"
-            >
-              Login
-            </a>
+            <Link
+                to="/login"
+                className="hover:underline font-medium cursor-pointer"
+              >
+                Register
+              </Link>
           </p>
         </div>
       </div>
