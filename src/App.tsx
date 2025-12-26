@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,11 +12,9 @@ import Compare from "./pages/Compare";
 import { CompareProvider } from "./context/CompareContext";
 
 
-  
 
 function App() {
   return (
-    <BrowserRouter>
     <CompareProvider>
       <Navbar />
       <Routes>
@@ -31,7 +29,7 @@ function App() {
       </Routes>
       <Footer />
       </CompareProvider>
-    </BrowserRouter>
+   
   );
 }
 
