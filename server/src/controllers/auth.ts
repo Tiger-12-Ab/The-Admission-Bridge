@@ -64,6 +64,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 // LOGIN
+// LOGIN
 export const login = async (req: Request, res: Response) => {
   try {
     const { identifier, password } = req.body;
@@ -88,12 +89,11 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ✅ FIXED TYPES
     const JWT_SECRET = process.env.JWT_SECRET!;
     const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
     const signOptions: SignOptions = {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: JWT_EXPIRES_IN as SignOptions["expiresIn"],
     };
 
     const token = jwt.sign(
@@ -114,3 +114,4 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Login failed" });
   }
 };
+
