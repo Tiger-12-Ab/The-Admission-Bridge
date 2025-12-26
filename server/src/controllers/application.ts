@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { db } from "../config/db";
+import  db  from "../config/db";
 
 export const applyForCourse = async (
   req: Request & { user?: { id: number } },
   res: Response
 ) => {
   try {
-    const userId = req.user!.id; // ✅ from JWT
+    const userId = req.user!.id; 
     const { universityId, courseId } = req.body;
 
     /* Fetch course */

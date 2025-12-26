@@ -3,18 +3,32 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const db = mysql.createPool({
-  port: process.env.DB_PORT,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+// ---- ENV SAFETY CHECKS  ----
+const {
+  DB_HOST,
+  DB_USER,
+  DB_PASS,
+  DB_NAME,
+  DB_PORT,
+} = process.env;
+
+if (!DB_HOST || !DB_USER || !DB_NAME) {
+  throw new Error("❌ Missing required database environment variables");
+}
+
+// ---- CREATE POOL ----
+const db = mysql.createPool({
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASS,
+  database: DB_NAME,
+  port: DB_PORT ? Number(DB_PORT) : 3306, 
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
-// Test the connection once when the app starts
+// ---- TEST CONNECTION ON STARTUP ----
 (async () => {
   try {
     const connection = await db.getConnection();
@@ -22,5 +36,8 @@ export const db = mysql.createPool({
     connection.release();
   } catch (error) {
     console.error("❌ Failed to connect to MySQL database:", error);
+    process.exit(1); 
   }
 })();
+
+export default db;

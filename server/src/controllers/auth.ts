@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { db } from "../config/db";
+import db from "../config/db";
 
-
-// resgister ----------------------
-
+// REGISTER
 export const register = async (req: Request, res: Response) => {
   try {
     const {
@@ -32,7 +30,6 @@ export const register = async (req: Request, res: Response) => {
 
     const userId = userResult.insertId;
 
-    // EDUCATION
     if (education?.education_level) {
       await db.query(
         `INSERT INTO user_academics
@@ -50,7 +47,6 @@ export const register = async (req: Request, res: Response) => {
       );
     }
 
-    // TEST
     if (test?.test_type) {
       await db.query(
         `INSERT INTO user_academics
@@ -67,14 +63,14 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-
-
-// login-----------------------------------------
-
-
+// LOGIN
 export const login = async (req: Request, res: Response) => {
   try {
     const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+      return res.status(400).json({ message: "Missing credentials" });
+    }
 
     const [rows]: any = await db.query(
       `SELECT * FROM users WHERE email = ? OR phone = ?`,
@@ -92,14 +88,22 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    const JWT_SECRET = process.env.JWT_SECRET as string;
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined");
+    }
+
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     res.json({ token, user: { id: user.id, name: user.full_name } });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Login failed" });
   }
 };
